@@ -103,7 +103,7 @@ func transformAction(c *cli.Context) error {
 	if err != nil {
 		return errors.New("could not transform the current image")
 	}
-	fmt.Printf("file created at: %s\n", f.Name())
+	fmt.Printf("file created: %s\n", f.Name())
 	return nil
 }
 
