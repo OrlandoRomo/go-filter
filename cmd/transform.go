@@ -16,10 +16,12 @@ import (
 
 const (
 	// to get RGB into 8 bits representation
-	eightBits       = 257
-	redWaveLength   = 0.21
-	greenWaveLength = 0.72
-	blueWaveLength  = 0.07
+	EightBits       = 257
+	RedWaveLength   = 0.21
+	GreenWaveLength = 0.72
+	BlueWaveLength  = 0.07
+	// For linux and Mac home directory
+	Home = "$HOME"
 )
 
 var supportedExtensions map[string]bool
@@ -42,6 +44,11 @@ func NewTransformCommand() *cli.Command {
 			&cli.StringFlag{
 				Name:  "grey",
 				Usage: "transform an image into grey-scale",
+			},
+			&cli.StringFlag{
+				Name:  "output",
+				Usage: "path where the output result will be placed",
+				Value: os.Getenv(Home),
 			},
 		},
 	}
@@ -83,7 +90,7 @@ func transformAction(c *cli.Context) error {
 		for y := 0; y < height; y++ {
 			r, g, b, _ := img.At(x, y).RGBA()
 			// TODO: implement a switch-case for more
-			rgb := getGreyScaleRGB(r/eightBits, g/eightBits, b/eightBits)
+			rgb := getGreyScaleRGB(r/EightBits, g/EightBits, b/EightBits)
 			filter := color.RGBA{
 				R: rgb,
 				G: rgb,
@@ -115,5 +122,5 @@ func isValidExtension(name string) bool {
 
 func getGreyScaleRGB(r, g, b uint32) uint8 {
 	// using the luminosity algorithm 0.21 * R + 0.72 * G + 0.07 * B
-	return uint8((redWaveLength * float64(r)) + (greenWaveLength * float64(g)) + (blueWaveLength * float64(b)))
+	return uint8((RedWaveLength * float64(r)) + (GreenWaveLength * float64(g)) + (BlueWaveLength * float64(b)))
 }
