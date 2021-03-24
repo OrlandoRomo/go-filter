@@ -7,19 +7,17 @@ import (
 	"image/color"
 	_ "image/jpeg"
 	"image/png"
-	_ "image/png"
 	"os"
 	"path/filepath"
 
+	"github.com/OrlandoRomo/imgfltr/cmd/fltrs"
 	"github.com/urfave/cli/v2"
 )
 
 const (
 	// to get RGB into 8 bits representation
-	EightBits       = 257
-	RedWaveLength   = 0.21
-	GreenWaveLength = 0.72
-	BlueWaveLength  = 0.07
+	EightBits uint32 = 257
+	Alpha     int    = 255
 	// For linux and Mac home directory
 	Home = "$HOME"
 )
@@ -31,20 +29,19 @@ func init() {
 		".png":  true,
 		".jpg":  true,
 		".jpeg": true,
+		".webp": true,
 	}
 }
 
-func NewTransformCommand() *cli.Command {
+func NewSetCommand() *cli.Command {
 	return &cli.Command{
-		Name:    "transform",
-		Aliases: []string{"t"},
-		Usage:   "transform takes a path as argument where the image is located.",
-		Action:  transformAction,
+		Name:  "set",
+		Usage: "set requires a filter name",
+		Subcommands: []*cli.Command{
+			fltrs.NewGreySubCommand(),
+			fltrs.NewSepiaSubCommand(),
+		},
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:  "grey",
-				Usage: "transform an image into grey-scale",
-			},
 			&cli.StringFlag{
 				Name:  "output",
 				Usage: "path where the output result will be placed",
@@ -54,7 +51,7 @@ func NewTransformCommand() *cli.Command {
 	}
 }
 
-func transformAction(c *cli.Context) error {
+func SetAction(c *cli.Context) error {
 	filePath := c.Args().First()
 	if len(filePath) == 0 {
 		return errors.New("transform command requires a path as argument")
@@ -65,11 +62,10 @@ func transformAction(c *cli.Context) error {
 	}
 
 	if !isValidExtension(file.Name()) {
-		return errors.New("image file is not supported. Supported extensions (.png, .jpg, .jpeg)")
+		return errors.New("image file is not supported. Supported extensions (.png, .jpg, .jpeg, .webp)")
 	}
 
 	// Move the rest of the code another independent function
-
 	imgConf, _, err := image.DecodeConfig(file)
 	if err != nil {
 		return errors.New(err.Error())
@@ -90,14 +86,23 @@ func transformAction(c *cli.Context) error {
 		for y := 0; y < height; y++ {
 			r, g, b, _ := img.At(x, y).RGBA()
 			// TODO: implement a switch-case for more
-			rgb := getGreyScaleRGB(r/EightBits, g/EightBits, b/EightBits)
+			// rgb := getGreyScaleRGB(r/EightBits, g/EightBits, b/EightBits)
+			// filter := color.RGBA{
+			// 	R: rgb,
+			// 	G: rgb,
+			// 	B: rgb,
+			// 	A: Alpha,
+			// }
+			// result.Set(x, y, filter)
+			tr, tg, tb := fltrs.GetSepiaTone(r/EightBits, g/EightBits, b/EightBits)
 			filter := color.RGBA{
-				R: rgb,
-				G: rgb,
-				B: rgb,
-				A: 255,
+				R: tr,
+				G: tg,
+				B: tb,
+				A: uint8(Alpha),
 			}
 			result.Set(x, y, filter)
+
 		}
 	}
 
@@ -118,9 +123,4 @@ func isValidExtension(name string) bool {
 	extension := filepath.Ext(name)
 	_, ok := supportedExtensions[extension]
 	return ok
-}
-
-func getGreyScaleRGB(r, g, b uint32) uint8 {
-	// using the luminosity algorithm 0.21 * R + 0.72 * G + 0.07 * B
-	return uint8((RedWaveLength * float64(r)) + (GreenWaveLength * float64(g)) + (BlueWaveLength * float64(b)))
 }

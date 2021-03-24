@@ -12,11 +12,12 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "imgfltr"
 	app.Usage = "CLI to apply different image filters"
-	app.Description = `imgfltr is a CLI tool to transform a local picture o 
-	image with the format (.png, .jpg, .jpeg) into different filters such as grey scale, inverted colors, etc`
+	app.Description = `imgfltr is a CLI tool to apply a local picture o 
+	image with the format (.png, .jpg, .jpeg) different filters such as grey scale, inverted colors, sepia etc`
 
 	app.Commands = []*cli.Command{
-		cmd.NewTransformCommand(),
+		cmd.NewSetCommand(),
+		cmd.NewListCommand(),
 	}
 
 	if err := app.Run(os.Args); err != nil {
