@@ -35,7 +35,6 @@ func applySepiaFilter(c *cli.Context) error {
 	e := new(Effect)
 
 	file, err := e.ReadFile(filePath)
-	fmt.Println(file.Name())
 	if err != nil {
 		return fmt.Errorf("%s", err.Error())
 	}
