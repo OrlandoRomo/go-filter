@@ -1,11 +1,82 @@
 package fltrs
 
+import (
+	"errors"
+	"fmt"
+	"image"
+	"image/png"
+	"math/rand"
+	"os"
+	"path/filepath"
+	"time"
+)
+
+const (
+	// to get RGB into 8 bits representation
+	EightBits     uint32 = 257
+	Alpha         int    = 255
+	maxCharacters int    = 7
+	letterRunes   string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+)
+
+var supportedExtensions map[string]bool
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+	supportedExtensions = map[string]bool{
+		".png":  true,
+		".jpg":  true,
+		".jpeg": true,
+		".webp": true,
+	}
+}
+
 type Filter interface {
 	GetGreyRGB(r, g, b uint32) uint8
 	GetSepiaRGB(r, g, b uint32) (uint8, uint8, uint8)
 }
 
-type Effect struct {
+func isValidExtension(name string) bool {
+	extension := filepath.Ext(name)
+	_, ok := supportedExtensions[extension]
+	return ok
+}
+func randomName() string {
+	b := make([]byte, maxCharacters)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
+}
+
+type Effect struct{}
+
+func (e *Effect) ReadFile(filePath string) (*os.File, error) {
+	if len(filePath) == 0 {
+		return nil, errors.New("`set` command requires a path as argument")
+	}
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+
+	if !isValidExtension(file.Name()) {
+		return nil, errors.New("file is not supported. Supported extensions (.png, .jpg, .jpeg, .webp)")
+	}
+	return file, nil
+}
+
+func (e *Effect) CreateFile(f *os.File, img image.Image, outputPath string) error {
+	ext := filepath.Ext(f.Name())
+	file, err := os.Create(fmt.Sprintf("%s/%s%s", outputPath, randomName(), ext))
+	if err != nil {
+		return err
+	}
+	err = png.Encode(file, img)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 //GetGreyRGB returns RGB values that represent the grey scale tone.
