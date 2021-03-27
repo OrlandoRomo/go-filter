@@ -30,6 +30,9 @@ func NewSetCommand() *cli.Command {
 		Subcommands: []*cli.Command{
 			fltrs.NewGreySubCommand(),
 			fltrs.NewSepiaSubCommand(),
+			fltrs.NewNegativeSubCommand(),
+			fltrs.NewMirrorSubCommand(),
+			fltrs.NewSketchSubCommand(),
 		},
 		Flags: []cli.Flag{
 			&cli.StringFlag{

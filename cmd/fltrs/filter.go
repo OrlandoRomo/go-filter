@@ -13,9 +13,11 @@ import (
 
 const (
 	// to get RGB into 8 bits representation
-	EightBits     uint32 = 257
-	Alpha         int    = 255
+	EightBits uint32 = 257
+	Alpha     int    = 255
+	max
 	maxCharacters int    = 7
+	maxIntensity  uint32 = 255
 	letterRunes   string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 )
 
@@ -34,6 +36,8 @@ func init() {
 type Filter interface {
 	GetGreyRGB(r, g, b uint32) uint8
 	GetSepiaRGB(r, g, b uint32) (uint8, uint8, uint8)
+	GetNegativeRGB(r, g, b uint32) (uint8, uint8, uint8)
+	GetSketchRGB(r, g, b uint32) (uint8, uint8, uint8)
 }
 
 func isValidExtension(name string) bool {
@@ -68,7 +72,11 @@ func (e *Effect) ReadFile(filePath string) (*os.File, error) {
 
 func (e *Effect) CreateFile(f *os.File, img image.Image, outputPath string) error {
 	ext := filepath.Ext(f.Name())
-	file, err := os.Create(fmt.Sprintf("%s/%s%s", outputPath, randomName(), ext))
+
+	path := fmt.Sprintf("%s/%s%s", outputPath, randomName(), ext)
+
+	file, err := os.Create(path)
+
 	if err != nil {
 		return err
 	}
@@ -76,6 +84,7 @@ func (e *Effect) CreateFile(f *os.File, img image.Image, outputPath string) erro
 	if err != nil {
 		return err
 	}
+	fmt.Printf("file created: %s\n", path)
 	return nil
 }
 
@@ -107,4 +116,28 @@ func (e *Effect) GetSepiaRGB(r, g, b uint32) (uint8, uint8, uint8) {
 	}
 
 	return uint8(tr), uint8(tg), uint8(tb)
+}
+
+func (e *Effect) GetNegativeRGB(r, g, b uint32) (uint8, uint8, uint8) {
+	// s = (L - 1) - r
+	// L - 1 = Max intensity value (255)
+	// r = current value of the pixel
+	sr := uint8(maxIntensity - r)
+	sg := uint8(maxIntensity - g)
+	sb := uint8(maxIntensity - b)
+
+	return sr, sg, sb
+}
+
+func (e *Effect) GetSketchRGB(r, g, b uint32) (uint8, uint8, uint8) {
+	intensity := e.GetGreyRGB(r, g, b)
+	if intensity > IntensityFactor {
+		return HighestValue, HighestValue, HighestValue
+	}
+	if intensity > 100 {
+		return MeanValue, MeanValue, MeanValue
+	}
+
+	return LowestValue, LowestValue, LowestValue
+
 }

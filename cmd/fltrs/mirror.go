@@ -1,35 +1,26 @@
 package fltrs
 
 import (
-	"fmt"
 	"image"
-	"image/color"
 
 	"github.com/urfave/cli/v2"
 )
 
-const (
-	RedWaveLength   float64 = 0.21
-	GreenWaveLength float64 = 0.72
-	BlueWaveLength  float64 = 0.07
-	RGBA            int     = 255
-)
-
-func NewGreySubCommand() *cli.Command {
+func NewMirrorSubCommand() *cli.Command {
 	return &cli.Command{
-		Name:   "grey",
-		Usage:  "apply the grey filter",
-		Action: applyGreyFilter,
+		Name:   "mirror",
+		Usage:  "apply the flip or mirror filter",
+		Action: applyMirrorFilter,
 	}
 }
 
-func applyGreyFilter(c *cli.Context) error {
+func applyMirrorFilter(c *cli.Context) error {
 	filePath := c.Args().First()
 	e := new(Effect)
 
 	file, err := e.ReadFile(filePath)
 	if err != nil {
-		return fmt.Errorf("%s", err.Error())
+		return err
 	}
 
 	imgConf, _, err := image.DecodeConfig(file)
@@ -38,7 +29,6 @@ func applyGreyFilter(c *cli.Context) error {
 	}
 	width, height := imgConf.Width, imgConf.Height
 
-	// reset io.Reader
 	file.Seek(0, 0)
 
 	img, _, err := image.Decode(file)
@@ -46,21 +36,17 @@ func applyGreyFilter(c *cli.Context) error {
 		return err
 	}
 
-	//new image to create
 	output := image.NewRGBA(image.Rect(0, 0, width, height))
+
 	for x := 0; x < width; x++ {
 		for y := 0; y < height; y++ {
-			r, g, b, _ := img.At(x, y).RGBA()
-			rgb := e.GetGreyRGB(r/EightBits, g/EightBits, b/EightBits)
-			filter := color.RGBA{
-				R: rgb,
-				G: rgb,
-				B: rgb,
-				A: uint8(Alpha),
-			}
-			output.Set(x, y, filter)
+			xp := imgConf.Width - x - 1
+			color := img.At(x, y)
+			// reversing matrix horizontally
+			output.Set(xp, y, color)
 		}
 	}
+
 	err = e.CreateFile(file, output, c.String("output"))
 	if err != nil {
 		return err

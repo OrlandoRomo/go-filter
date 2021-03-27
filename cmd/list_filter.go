@@ -12,6 +12,9 @@ func init() {
 	filters = map[int]string{
 		1: "Grey filter",
 		2: "Sepia filter",
+		3: "Negative filter",
+		4: "Flip or mirror filter",
+		5: "Sketch filter",
 	}
 }
 func NewListCommand() *cli.Command {
