@@ -15,6 +15,9 @@ func init() {
 		3: "Negative filter",
 		4: "Flip or mirror filter",
 		5: "Sketch filter",
+		6: "Red filter",
+		7: "Blue filter",
+		8: "Green filter",
 	}
 }
 func NewListCommand() *cli.Command {
@@ -28,8 +31,8 @@ func NewListCommand() *cli.Command {
 
 func listFilters(c *cli.Context) error {
 	fmt.Println("List of supported filters:")
-	for i, filter := range filters {
-		fmt.Printf("\t%d. %s\n", i, filter)
+	for _, filter := range filters {
+		fmt.Printf("\t%s %s\n", "-", filter)
 	}
 	return nil
 }

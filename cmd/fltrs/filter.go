@@ -38,6 +38,9 @@ type Filter interface {
 	GetSepiaRGB(r, g, b uint32) (uint8, uint8, uint8)
 	GetNegativeRGB(r, g, b uint32) (uint8, uint8, uint8)
 	GetSketchRGB(r, g, b uint32) (uint8, uint8, uint8)
+	GetRedRGB(r, g, b uint32) (uint8, uint8, uint8)
+	GetGreenRGB(r, g, b uint32) (uint8, uint8, uint8)
+	GetBlueRGB(r, g, b uint32) (uint8, uint8, uint8)
 }
 
 func isValidExtension(name string) bool {
@@ -139,5 +142,40 @@ func (e *Effect) GetSketchRGB(r, g, b uint32) (uint8, uint8, uint8) {
 	}
 
 	return LowestValue, LowestValue, LowestValue
+}
 
+func (e *Effect) GetRedRGB(r, g, b uint32) (uint8, uint8, uint8) {
+	r = MaxRed
+	if g > MinGreenForRed {
+		g = MinGreenForRed
+	}
+	if b > MinBlueForRed {
+		b = MinBlueForRed
+	}
+
+	return uint8(r), uint8(g), uint8(b)
+}
+
+func (e *Effect) GetGreenRGB(r, g, b uint32) (uint8, uint8, uint8) {
+	g = MaxGreen
+	if r > MinRedForGreen {
+		r = MinRedForGreen
+	}
+	if b > MinBlueForGreen {
+		b = MinBlueForGreen
+	}
+
+	return uint8(r), uint8(g), uint8(b)
+}
+
+func (e *Effect) GetBlueRGB(r, g, b uint32) (uint8, uint8, uint8) {
+	b = MaxBlue
+	if r > MinRedForBlue {
+		r = MinRedForBlue
+	}
+	if g > MinGreenForBlue {
+		b = MinGreenForBlue
+	}
+
+	return uint8(r), uint8(g), uint8(b)
 }
