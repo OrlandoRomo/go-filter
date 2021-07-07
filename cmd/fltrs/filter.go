@@ -80,6 +80,7 @@ func (e *Effect) CreateFile(f *os.File, img image.Image, outputPath string) erro
 
 	file, err := os.Create(path)
 
+	fmt.Println()
 	if err != nil {
 		return err
 	}
