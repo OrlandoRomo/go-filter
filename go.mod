@@ -1,8 +1,5 @@
-module github.com/OrlandoRomo/imgfltr
+module github.com/OrlandoRomo/go-filter
 
-go 1.15
+go 1.16
 
-require (
-	github.com/urfave/cli v1.22.5
-	github.com/urfave/cli/v2 v2.3.0
-)
+require github.com/urfave/cli/v2 v2.3.0
