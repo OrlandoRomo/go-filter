@@ -50,15 +50,17 @@ func applySketchFilter(c *cli.Context) error {
 
 	for x := 0; x < width; x++ {
 		for y := 0; y < height; y++ {
-			r, g, b, _ := img.At(x, y).RGBA()
-			newR, newG, newB := e.GetSketchRGB(r/EightBits, g/EightBits, b/EightBits)
-			sketch := color.RGBA{
-				R: newR,
-				G: newG,
-				B: newB,
-				A: uint8(Alpha),
-			}
-			output.Set(x, y, sketch)
+			go func(x, y int) {
+				r, g, b, _ := img.At(x, y).RGBA()
+				newR, newG, newB := e.GetSketchRGB(r/EightBits, g/EightBits, b/EightBits)
+				sketch := color.RGBA{
+					R: newR,
+					G: newG,
+					B: newB,
+					A: uint8(Alpha),
+				}
+				output.Set(x, y, sketch)
+			}(x, y)
 		}
 	}
 

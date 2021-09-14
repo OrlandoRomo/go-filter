@@ -54,7 +54,6 @@ func applyBlurFilter(c *cli.Context) error {
 	for x := offset; x < (width - offset); x++ {
 		for y := offset; y < (height - offset); y++ {
 			acc := make([]float64, 3)
-
 			for i := 0; i < len(blurKernel); i++ {
 				for j := 0; j < len(blurKernel); j++ {
 					xn := x + i - offset
@@ -73,7 +72,6 @@ func applyBlurFilter(c *cli.Context) error {
 			})
 		}
 	}
-	wg.Wait()
 	err = effect.CreateFile(file, output, c.String("output"))
 	if err != nil {
 		return err

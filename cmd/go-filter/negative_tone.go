@@ -40,8 +40,7 @@ func applyNegativeFilter(c *cli.Context) error {
 
 	for x := 0; x < width; x++ {
 		for y := 0; y < height; y++ {
-			wg.Add(1)
-			go func() {
+			go func(x, y int) {
 				r, g, b, _ := img.At(x, y).RGBA()
 				sr, sg, sb := e.GetNegativeRGB(r/EightBits, g/EightBits, b/EightBits)
 				filter := color.RGBA{
@@ -51,11 +50,9 @@ func applyNegativeFilter(c *cli.Context) error {
 					A: uint8(Alpha),
 				}
 				output.Set(x, y, filter)
-			}()
-			wg.Done()
+			}(x, y)
 		}
 	}
-	wg.Wait()
 	err = e.CreateFile(file, output, c.String("output"))
 	if err != nil {
 		return err

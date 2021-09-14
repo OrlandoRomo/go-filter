@@ -38,6 +38,7 @@ func applySharpFilter(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
+
 	width, height := imgConf.Width, imgConf.Height
 
 	file.Seek(0, 0)

@@ -57,16 +57,18 @@ func applySepiaFilter(c *cli.Context) error {
 	output := image.NewRGBA(image.Rect(0, 0, width, height))
 	for x := 0; x < width; x++ {
 		for y := 0; y < height; y++ {
-			r, g, b, _ := img.At(x, y).RGBA()
-			tr, tg, tb := e.GetSepiaRGB(r/EightBits, g/EightBits, b/EightBits)
-			filter := color.RGBA{
-				R: tr,
-				G: tg,
-				B: tb,
-				A: uint8(Alpha),
-			}
+			go func(x, y int) {
+				r, g, b, _ := img.At(x, y).RGBA()
+				tr, tg, tb := e.GetSepiaRGB(r/EightBits, g/EightBits, b/EightBits)
+				filter := color.RGBA{
+					R: tr,
+					G: tg,
+					B: tb,
+					A: uint8(Alpha),
+				}
 
-			output.Set(x, y, filter)
+				output.Set(x, y, filter)
+			}(x, y)
 		}
 	}
 	err = e.CreateFile(file, output, c.String("output"))

@@ -15,15 +15,15 @@ const (
 	RGBA            int     = 255
 )
 
-func NewGreySubCommand() *cli.Command {
+func NewGraySubCommand() *cli.Command {
 	return &cli.Command{
-		Name:   "grey",
-		Usage:  "apply the grey filter",
-		Action: applyGreyFilter,
+		Name:   "gray",
+		Usage:  "apply the gray filter",
+		Action: applyGrayFilter,
 	}
 }
 
-func applyGreyFilter(c *cli.Context) error {
+func applyGrayFilter(c *cli.Context) error {
 	filePath := c.Args().First()
 
 	file, err := effect.ReadFile(filePath)
@@ -49,10 +49,9 @@ func applyGreyFilter(c *cli.Context) error {
 	output := image.NewRGBA(image.Rect(0, 0, width, height))
 	for x := 0; x < width; x++ {
 		for y := 0; y < height; y++ {
-			wg.Add(1)
-			go func() {
+			go func(x, y int) {
 				r, g, b, _ := img.At(x, y).RGBA()
-				rgb := effect.GetGreyRGB(r/EightBits, g/EightBits, b/EightBits)
+				rgb := effect.GetGrayRGB(r/EightBits, g/EightBits, b/EightBits)
 				filter := color.RGBA{
 					R: rgb,
 					G: rgb,
@@ -60,11 +59,9 @@ func applyGreyFilter(c *cli.Context) error {
 					A: uint8(Alpha),
 				}
 				output.Set(x, y, filter)
-			}()
-			wg.Done()
+			}(x, y)
 		}
 	}
-	wg.Wait()
 	err = effect.CreateFile(file, output, c.String("output"))
 	if err != nil {
 		return err

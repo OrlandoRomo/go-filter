@@ -64,8 +64,8 @@ func (e *Effect) CreateFile(f *os.File, img image.Image, outputPath string) erro
 	return nil
 }
 
-//GetGreyRGB returns RGB values that represent the grey scale tone.
-func (e *Effect) GetGreyRGB(r, g, b uint32) uint8 {
+//GetGrayRGB returns RGB values that represent the gray scale tone.
+func (e *Effect) GetGrayRGB(r, g, b uint32) uint8 {
 	// using the luminosity algorithm 0.21 * R + 0.72 * G + 0.07 * B
 	return uint8((RedWaveLength * float64(r)) + (GreenWaveLength * float64(g)) + (BlueWaveLength * float64(b)))
 }
@@ -106,7 +106,7 @@ func (e *Effect) GetNegativeRGB(r, g, b uint32) (uint8, uint8, uint8) {
 }
 
 func (e *Effect) GetSketchRGB(r, g, b uint32) (uint8, uint8, uint8) {
-	intensity := e.GetGreyRGB(r, g, b)
+	intensity := e.GetGrayRGB(r, g, b)
 	if intensity > IntensityFactor {
 		return HighestValue, HighestValue, HighestValue
 	}

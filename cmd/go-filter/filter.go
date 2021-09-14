@@ -2,15 +2,11 @@ package main
 
 import (
 	"os"
-	"sync"
 
 	"github.com/urfave/cli/v2"
 )
 
-var (
-	effect *Effect
-	wg     sync.WaitGroup
-)
+var effect *Effect
 
 func NewFilterCommand() *cli.Command {
 	filterCommand := &cli.Command{
@@ -26,12 +22,15 @@ func NewFilterCommand() *cli.Command {
 	}
 	filterCommand.Subcommands = []*cli.Command{
 		NewListCommand(),
-		NewGreySubCommand(),
+		NewGraySubCommand(),
 		NewNegativeSubCommand(),
 		NewRedSubCommand(),
 		NewBlueSubCommand(),
 		NewGreenSubCommand(),
 		NewMirrorSubCommand(),
+		NewSepiaSubCommand(),
+		NewSketchSubCommand(),
+		NewSharpSubCommand(),
 	}
 	return filterCommand
 }
