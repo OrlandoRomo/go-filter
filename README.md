@@ -17,7 +17,7 @@ go mod tidy
 cd cmd/go-filter && go build .
 ```
 Move the binary in your local environment
-  - Linux/Mac: `sudo go-filter /usr/local/bin`
+  - Linux/Mac: `sudo mv go-filter /usr/local/bin`
 
 # Go Filter manual
 To use `go-filter` open a new terminal in your current operative system and type `go-filter` and enter.
